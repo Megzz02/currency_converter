@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import CurrencySelector from "./components/CurrencySelector";
-import AmountInput from "./components/AmountInput";
-import ConversionResult from "./components/ConversionResult";
-import FavoritePairs from "./components/FavoritePairs";
-import DarkModeToggle from "./components/DarkModeToggle";
+import CurrencySelector from "./components/CurrencySelector.jsx";
+import AmountInput from "./components/AmountInput.jsx";
+import ConversionResult from "./components/ConversionResult.jsx";
+import FavoritePairs from "./components/FavoritePairs.jsx";
+import DarkModeToggle from "./components/DarkModeToggle.jsx";
 import "./App.css";
 
 const App = () => {
