@@ -7,43 +7,31 @@ import DarkModeToggle from "./components/DarkModeToggle.jsx";
 import "./App.css";
 
 const App = () => {
-  const [rates, setRates] = useState({});
-  const [fromCurrency, setFromCurrency] = useState("USD");
-  const [toCurrency, setToCurrency] = useState("EUR");
-  const [amount, setAmount] = useState(1);
-  const [convertedAmount, setConvertedAmount] = useState(0);
-  const [favorites, setFavorites] = useState([]);
+  // State for dark mode
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
 
-  useEffect(() => {
-    const fetchRates = async () => {
-      try {
-        const response = await fetch(
-          `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`
-        );
-        const data = await response.json();
-        setRates(data.rates);
-      } catch (error) {
-        console.error("Error fetching exchange rates:", error);
-      }
-    };
-    fetchRates();
-  }, [fromCurrency]);
-
-  useEffect(() => {
-    if (rates[toCurrency]) {
-      setConvertedAmount((amount * rates[toCurrency]).toFixed(2));
-    }
-  }, [rates, toCurrency, amount]);
-
+  // Toggle dark mode
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
     localStorage.setItem("darkMode", newMode);
   };
 
+  // Apply dark or light class to body
+  useEffect(() => {
+    document.body.className = darkMode ? "dark" : "light";
+  }, [darkMode]);
+
+  // Mock state for currency data and favorite pairs
+  const [amount, setAmount] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState("USD");
+  const [toCurrency, setToCurrency] = useState("EUR");
+  const [convertedAmount, setConvertedAmount] = useState(0.85);
+  const [favorites, setFavorites] = useState([]);
+
+  // Add to favorites
   const addFavorite = () => {
     const pair = `${fromCurrency} -> ${toCurrency}`;
     if (!favorites.includes(pair)) {
@@ -52,20 +40,20 @@ const App = () => {
   };
 
   return (
-    <div className={`app ${darkMode ? "dark" : ""}`}>
+    <div className="app">
       <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <h1>Currency Converter</h1>
       <CurrencySelector
         label="From"
         selectedCurrency={fromCurrency}
         onCurrencyChange={setFromCurrency}
-        rates={rates}
+        rates={{ USD: 1, EUR: 0.85, EGP: 15.7 }}
       />
       <CurrencySelector
         label="To"
         selectedCurrency={toCurrency}
         onCurrencyChange={setToCurrency}
-        rates={rates}
+        rates={{ USD: 1, EUR: 0.85, EGP: 15.7 }}
       />
       <AmountInput amount={amount} onAmountChange={setAmount} />
       <ConversionResult
