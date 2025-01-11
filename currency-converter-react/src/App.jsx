@@ -73,6 +73,12 @@ const App = () => {
     setFavorites(favorites.filter((favorite) => favorite !== pair));
   };
 
+  // Swap the "From" and "To" currencies
+  const swapCurrencies = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+  };
+
   return (
     <div className="app">
       {/* Dark Mode Toggle */}
@@ -94,6 +100,11 @@ const App = () => {
         onCurrencyChange={setToCurrency}
         rates={rates}
       />
+
+      {/* Swap Currencies Button */}
+      <button onClick={swapCurrencies} style={{ margin: "10px 0" }}>
+        Swap Currencies
+      </button>
 
       {/* Amount Input */}
       <AmountInput amount={amount} onAmountChange={setAmount} />
