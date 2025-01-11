@@ -7,10 +7,16 @@ import DarkModeToggle from "./components/DarkModeToggle.jsx";
 import "./App.css";
 
 const App = () => {
-  // State for dark mode
+  // States
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("darkMode") === "true"
   );
+  const [amount, setAmount] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState("USD");
+  const [toCurrency, setToCurrency] = useState("EUR");
+  const [convertedAmount, setConvertedAmount] = useState(0);
+  const [rates, setRates] = useState({});
+  const [favorites, setFavorites] = useState([]);
 
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -24,12 +30,28 @@ const App = () => {
     document.body.className = darkMode ? "dark" : "light";
   }, [darkMode]);
 
-  // Mock state for currency data and favorite pairs
-  const [amount, setAmount] = useState(1);
-  const [fromCurrency, setFromCurrency] = useState("USD");
-  const [toCurrency, setToCurrency] = useState("EUR");
-  const [convertedAmount, setConvertedAmount] = useState(0.85);
-  const [favorites, setFavorites] = useState([]);
+  // Fetch exchange rates from API
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const response = await fetch(
+          "https://api.exchangerate-api.com/v4/latest/USD"
+        );
+        const data = await response.json();
+        setRates(data.rates);
+      } catch (error) {
+        console.error("Error fetching exchange rates:", error);
+      }
+    };
+    fetchRates();
+  }, []);
+
+  // Calculate converted amount whenever inputs change
+  useEffect(() => {
+    if (rates[toCurrency]) {
+      setConvertedAmount((amount * rates[toCurrency]).toFixed(2));
+    }
+  }, [amount, fromCurrency, toCurrency, rates]);
 
   // Add to favorites
   const addFavorite = () => {
@@ -41,28 +63,41 @@ const App = () => {
 
   return (
     <div className="app">
+      {/* Dark Mode Toggle */}
       <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+
+      {/* Title */}
       <h1>Currency Converter</h1>
+
+      {/* Currency Selectors */}
       <CurrencySelector
         label="From"
         selectedCurrency={fromCurrency}
         onCurrencyChange={setFromCurrency}
-        rates={{ USD: 1, EUR: 0.85, EGP: 15.7 }}
+        rates={rates}
       />
       <CurrencySelector
         label="To"
         selectedCurrency={toCurrency}
         onCurrencyChange={setToCurrency}
-        rates={{ USD: 1, EUR: 0.85, EGP: 15.7 }}
+        rates={rates}
       />
+
+      {/* Amount Input */}
       <AmountInput amount={amount} onAmountChange={setAmount} />
+
+      {/* Conversion Result */}
       <ConversionResult
         amount={amount}
         fromCurrency={fromCurrency}
         toCurrency={toCurrency}
         convertedAmount={convertedAmount}
       />
+
+      {/* Add to Favorites Button */}
       <button onClick={addFavorite}>Add to Favorites</button>
+
+      {/* Favorite Currency Pairs */}
       <FavoritePairs favorites={favorites} />
     </div>
   );
