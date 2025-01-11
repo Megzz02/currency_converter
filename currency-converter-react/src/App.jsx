@@ -30,12 +30,12 @@ const App = () => {
     document.body.className = darkMode ? "dark" : "light";
   }, [darkMode]);
 
-  // Fetch exchange rates from API
+  // Fetch exchange rates whenever `fromCurrency` changes
   useEffect(() => {
     const fetchRates = async () => {
       try {
         const response = await fetch(
-          "https://api.exchangerate-api.com/v4/latest/USD"
+          `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`
         );
         const data = await response.json();
         setRates(data.rates);
@@ -44,14 +44,14 @@ const App = () => {
       }
     };
     fetchRates();
-  }, []);
+  }, [fromCurrency]);
 
   // Calculate converted amount whenever inputs change
   useEffect(() => {
     if (rates[toCurrency]) {
       setConvertedAmount((amount * rates[toCurrency]).toFixed(2));
     }
-  }, [amount, fromCurrency, toCurrency, rates]);
+  }, [amount, toCurrency, rates]);
 
   // Add to favorites
   const addFavorite = () => {
@@ -59,6 +59,18 @@ const App = () => {
     if (!favorites.includes(pair)) {
       setFavorites([...favorites, pair]);
     }
+  };
+
+  // Select a favorite pair
+  const onSelectPair = (pair) => {
+    const [from, to] = pair.split(" -> ");
+    setFromCurrency(from);
+    setToCurrency(to);
+  };
+
+  // Remove a favorite pair
+  const onRemovePair = (pair) => {
+    setFavorites(favorites.filter((favorite) => favorite !== pair));
   };
 
   return (
@@ -98,7 +110,11 @@ const App = () => {
       <button onClick={addFavorite}>Add to Favorites</button>
 
       {/* Favorite Currency Pairs */}
-      <FavoritePairs favorites={favorites} />
+      <FavoritePairs
+        favorites={favorites}
+        onSelectPair={onSelectPair}
+        onRemovePair={onRemovePair}
+      />
     </div>
   );
 };
